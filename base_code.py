@@ -5,6 +5,7 @@ import retrying
 import requests
 import os
 import numpy as np
+import time
 
 # for now: ID's the TIFF file being analyzed; may need to be turned into a for loop later to go
 # through all the files in a folder or something
