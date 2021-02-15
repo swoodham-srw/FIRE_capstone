@@ -38,3 +38,4 @@ for filename in os.listdir(directory):
 #save new file as delta NDVI
 
 #this is a test
+#test 2
