@@ -8,10 +8,9 @@ import time
 
 
 #opening tif file
-'''
 image_file = plt.imread("test_code.tif")
 plt.imshow(image_file, cmap='Blues')
-plt.show()'''
+plt.show()
 
 #some calcul
 #save calc in file
