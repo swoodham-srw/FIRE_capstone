@@ -5,3 +5,47 @@ import requests
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+
+#read in the image
+src = rasterio.open('milli_fire_non_control_burn.tif')
+
+#read in the NIR and Red bands
+band_red = src.read(3)
+band_nir = src.read(4)
+
+#import the xml data from the image (look for .xml)
+from xml.dom import minidom
+xmldoc = minidom.parse('milli_fire_non_control_burn_xml.xml')
+nodes = xmldoc.getElementsByTagName("ps:bandSpecificMetadata")
+
+#assign the bands to numbers
+coeffs = {}
+for node in nodes:
+    bn = node.getElementsByTagName("ps:bandNumber")[0].firstChild.data
+    if bn in ['1', '2', '3', '4']:
+        i = int(bn)
+        value = node.getElementsByTagName("ps:reflectanceCoefficient")[0].firstChild.data
+        coeffs[i] = float(value)
+
+#Multiply the band values by the TOA Reflectance coefficients
+band_red = band_red * coeffs[3]
+band_nir = band_nir * coeffs[4]
+
+#allow division by zero
+numpy.seterr(divide='ignore', invalid='ignore')
+
+#calculate NDVI
+ndvi = (band_nir.astype(float) - band_red.astype(float))/(band_nir + band_red)
+
+#Set spatial characteristics of the output object to mirror the input
+kwargs = src.meta
+kwargs.update(
+    dtype=rasterio.float32,
+    count=1)
+
+#Create the file
+with rasterio.open('ndvi.tif', 'w', **kwargs) as dst:
+    dst.write_band(1, ndvi.astype(rasterio.float32))
+
+#apply a color map
+plt.imsave("ndvi_cmap.png", ndvi, cmap=plt.cm.summer)
