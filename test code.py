@@ -36,3 +36,5 @@ for filename in os.listdir(directory):
 #new calcul = delta NDVI
 #plot delta NDVI 
 #save new file as delta NDVI
+
+#this is a test
